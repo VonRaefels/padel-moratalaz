@@ -1,0 +1,1 @@
+curl -i -X PUT -H 'Content-Type: application/json' -d '[{ "name": "Pedro Madrid", "email": "pedromadrid@gmail.com", "telefono": "233", "sexo": "v", "nivel": "a", "edad": "20"}, { "name": "Jorge Perez", "email": "jorgeperez@gmail.com", "telefono": "646689491", "sexo": "m", "nivel": "a", "edad": "22"}]' http://localhost:3000/parejas
