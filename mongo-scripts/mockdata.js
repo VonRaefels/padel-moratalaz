@@ -12,6 +12,7 @@ db.Pareja.remove();
 db.Grupo.remove();
 db.Configuration.remove();
 db.Categoria.remove();
+db.Partido.remove();
 
 //id's...
 var idFases = [ObjectId(), ObjectId()];
@@ -27,10 +28,12 @@ for(i=0; i<5; i++){
 var idGrupos = [ObjectId(), ObjectId(), ObjectId()];
 var idCategorias = [ObjectId(), ObjectId(), ObjectId()];
 
+var idPartidos = [ObjectId(), ObjectId(), ObjectId(), ObjectId()];
+
 //Guardamos los datos.
 
-db.Fase.save( {_id: idFases[0], name: "Fase de Otoño", categorias:  [idCategorias[0], idCategorias[1]]} );
-db.Fase.save( {_id: idFases[1], name: "Fase de Verano", categorias:  [idCategorias[2]]} );
+db.Fase.save( {_id: idFases[0], name: "Fase de Otoño", categorias:  [idCategorias[0], idCategorias[2]]} );
+db.Fase.save( {_id: idFases[1], name: "Fase de Verano", categorias:  [idCategorias[1]]} );
 
 db.Configuration.save( {_id: idConfiguration, faseEnCurso: idFases[0]} );
 
@@ -53,17 +56,22 @@ for each(var jugador in jugadores){
     counter++;
 }
 
-db.Pareja.save( {_id: idParejas[0], jugador1: idJugadores[0], jugador2: idJugadores[1], fase: idFases[0]} );
-db.Pareja.save( {_id: idParejas[1], jugador1: idJugadores[2], jugador2: idJugadores[3], fase: idFases[0]} );
-db.Pareja.save( {_id: idParejas[2], jugador1: idJugadores[4], jugador2: idJugadores[5], fase: idFases[0]} );
-db.Pareja.save( {_id: idParejas[3], jugador1: idJugadores[6], jugador2: idJugadores[7], fase: idFases[0]} );
-db.Pareja.save( {_id: idParejas[4], jugador1: idJugadores[8], jugador2: idJugadores[9], fase: idFases[1]} );
+db.Pareja.save( {_id: idParejas[0], jugador1: idJugadores[0], jugador2: idJugadores[1], asignada: false} );
+db.Pareja.save( {_id: idParejas[1], jugador1: idJugadores[2], jugador2: idJugadores[3], asignada: false} );
+db.Pareja.save( {_id: idParejas[2], jugador1: idJugadores[4], jugador2: idJugadores[5], asignada: false} );
+db.Pareja.save( {_id: idParejas[3], jugador1: idJugadores[6], jugador2: idJugadores[7], asignada: false} );
+db.Pareja.save( {_id: idParejas[4], jugador1: idJugadores[8], jugador2: idJugadores[9], asignada: false} );
 
-db.Grupo.save( {_id: idGrupos[0], parejas:  [idParejas[0], idParejas[1]], name: "Grupo rojo"} );
-db.Grupo.save( {_id: idGrupos[1], parejas:  [idParejas[2], idParejas[3]], name: "Grupo azul"} );
-db.Grupo.save( {_id: idGrupos[2], parejas:  [idParejas[4]], name: "Grupo rojo"} );
+
+db.Grupo.save( {_id: idGrupos[0], parejas:  [idParejas[0], idParejas[1]], name: "Grupo rojo", partidos: [idPartidos[0], idPartidos[1]]} );
+db.Grupo.save( {_id: idGrupos[1], parejas:  [idParejas[2], idParejas[3]], name: "Grupo azul", partidos: [idPartidos[2], idPartidos[3]]} );
+db.Grupo.save( {_id: idGrupos[2], parejas:  [idParejas[4]], name: "Grupo rojo", partidos: []} );
 
 db.Categoria.save( {_id: idCategorias[0], grupos:  [idGrupos[0]], name: "Categoria masculina"} );
 db.Categoria.save( {_id: idCategorias[1], grupos:  [idGrupos[1]], name: "Categoria masculina"} );
 db.Categoria.save( {_id: idCategorias[2], grupos:  [idGrupos[2]], name: "Categoria femenina"} );
 
+db.Partido.save( {_id: idPartidos[0], pareja1: idParejas[0], pareja2: idParejas[1], resultado: '6/4 3/6 7/5'} );
+db.Partido.save( {_id: idPartidos[1], pareja1: idParejas[2], pareja2: idParejas[3], resultado: '6/4 3/6 7/5'} );
+db.Partido.save( {_id: idPartidos[2], pareja1: idParejas[0], pareja2: idParejas[2], resultado: '6/4 3/6 7/5'} );
+db.Partido.save( {_id: idPartidos[3], pareja1: idParejas[4], pareja2: idParejas[1], resultado: '6/4 3/6 7/5'} );

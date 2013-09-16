@@ -14,10 +14,10 @@ exports.getFaseEnCurso = function(callback){
             idFaseEnCurso = doc.faseEnCurso;
             models.Fase.findById( ObjectId.fromString(idFaseEnCurso), function(err, doc){
                 faseEnCurso = doc;
-                callback(faseEnCurso);
+                callback(err, faseEnCurso);
             });
         });
     }else{
-        callback(faseEnCurso);
+        callback(null, faseEnCurso);
     }
 };

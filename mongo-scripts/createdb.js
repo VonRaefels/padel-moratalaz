@@ -12,5 +12,6 @@ db.createCollection("Fase");
 db.createCollection("Configuration");
 db.createCollection("Grupo");
 db.createCollection("Categoria");
+db.createCollection("Partido");
 
 

@@ -1,12 +1,13 @@
-522edd290ec46c8d115878eb
-
--> Paginación
 -> Partidos
--> Enviar solo algunos datos importantes de la api como en jugadores.
--> Errores del servidor cuando no encuentra los datos.
--> Inserts
+
 -> Administración
 -> Auth en la api
--> Invertir fase en las parejas....
--> Mejor control de errores
+-> Csrf en formulario...
+
+-> Clase o modulo de control de errores!!!!!!!!!!!!!!
+
 -> Datos de torneo en pareja.
+
+-> Código duplicado en helpers y api.
+
+-> Quitar parejas en curso?

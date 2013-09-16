@@ -1,101 +1,170 @@
 var models = require('../models/schemas');
+var helpers = require('../models/helpers').Helpers;
 var config = require('../config/config');
+var mongoose = require('mongoose');
+
+var Query = mongoose.Query;
 var ObjectId = config.ObjectId;
 
-
-exports.fases = function(req, res){
-    _sendDocumentIfNotErrorWithModel(models.Fase, res);
-}
-
-exports.faseEnCurso = function(req, res){
-    config.getFaseEnCurso(function(faseEnCurso){
-        res.send(faseEnCurso);
-    });
+var FaseAPI = {
+    getFases : function(req, res){
+        _sendDocumentIfNotErrorWithModel(models.Fase, req, res);
+    },
+    getFaseEnCurso : function(req, res){
+        config.getFaseEnCurso(function(err, faseEnCurso){
+            _sendDocumentIfNotError(res, err, faseEnCurso);
+        });
+    },
+    getFase: function(req, res){
+        var idFase = req.param('id');
+        models.Fase.findById(ObjectId.fromString(idFase), function(err, doc){
+            _sendDocumentIfNotError(res, err, doc);
+        });
+    }
 };
 
-exports.jugadores = function(req, res){
-    models.Jugador.find().select('name sexo').exec(function(err, doc){
-        _sendDocumentIfNotError(res, err, doc);
-    });
+var JugadorAPI = {
+    getJugadores : function(req, res){
+        var paginateOpts = {limit: req.query.limit, offset: req.query.offset};
+        models.Jugador.createQuery().select('name sexo').paginate(paginateOpts, function(err, doc){
+            _sendDocumentIfNotError(res, err, doc);
+        });
+    },
+    getJugador : function(req, res){
+        idJugador = req.param('id');
+        models.Jugador.findById(ObjectId.fromString(idJugador), function(err, doc){
+            _sendDocumentIfNotError(res, err, doc);
+        });
+    }
 };
 
-exports.jugador = function(req, res){
-    idJugador = req.param('id');
-    models.Jugador.findById(ObjectId.fromString(idJugador), function(err, doc){
-        _sendDocumentIfNotError(res, err, doc);
-    });
-}
-
-exports.parejas = function(req, res){
-    _sendDocumentIfNotErrorWithModel(models.Pareja, res);
-};
-
-exports.addPareja = function(req, res){//TODO validate
-    var pareja = req.body;
-    jugador1Data = pareja[0];
-    jugador2Data = pareja[1];
-    _createJugador(jugador1Data, function(err, jugador1Model){
-        _createJugador(jugador2Data, function(err, jugador2Model){
-            config.getFaseEnCurso(function(faseEnCurso){
-                var parejaData = {jugador1: jugador1Model._id, jugador2: jugador2Model._id, fase: faseEnCurso._id};
-                console.log(parejaData);
-                models.Pareja.create(parejaData, function(err, pareja){
-                    res.send(pareja);
+var ParejaAPI = {
+    getParejas : function(req, res){
+        _sendDocumentIfNotErrorWithModel(models.Pareja, req, res);
+    },
+    addPareja : function(req, res){//TODO validate
+        var pareja = req.body;
+        primerJugadorJson = pareja[0];
+        segundoJugadorJson = pareja[1];
+        _createPareja(primerJugadorJson, segundoJugadorJson, res);
+    },
+    getParejasSinAsignar : function(req, res){
+        var paginateOpts = {limit: req.query.limit, offset: req.query.offset};
+        models.Pareja.paginate({"asignada": false}, paginateOpts, function(err, doc){
+            _sendDocumentIfNotError(res, err, doc);
+        });
+    },
+    getParejasWithinGroup : function(req, res){
+        _populateModel(req, models.Grupo, 'parejas', function(err, query, grupo){
+            var parejas = grupo.parejas;
+            helpers.populateParejas(parejas, function(){
+                models.Grupo.findById(req.param('id'), function(err, grupoSinPopular){
+                    helpers.addMeta(req, grupo.parejas, grupoSinPopular.parejas.length, function(data){
+                        _sendDocumentIfNotError(res, err, data);
+                    });
                 });
             });
         });
+    },
+    getPareja : function(req, res){
+        idPareja = req.param('id');
+        models.Pareja.findById(ObjectId.fromString(idPareja), function(err, doc){
+            _sendDocumentIfNotError(res, err, doc);
+        });
+    }
+};
+
+function _createPareja(primerJugadorJson, segundoJugadorJson, res){
+    _createJugador(primerJugadorJson, function(err, primerJugador){
+        _createJugador(segundoJugadorJson, function(err, segundoJugador){
+            _savePareja(primerJugador,segundoJugador, res);
+        });
     });
 }
-
-function _createJugador(data, callback){ //TODO refactor
-    models.Jugador.create(data, function(err, jugador){//TODO handle errors
+function _createJugador(data, callback){
+    models.Jugador.create(data, function(err, jugador){
         callback(err, jugador);
     });
 }
 
-exports.parejasEnCurso = function(req, res){
-    config.getFaseEnCurso(function(faseEnCurso){
-        models.Pareja.find( {fase: faseEnCurso}, function(err, doc){
-            _sendDocumentIfNotError(res, err, doc);
+function _savePareja(primerJugador, segundoJugador, res){
+    config.getFaseEnCurso(function(err, faseEnCurso){//TODO control de errores
+        var parejaData = {jugador1: primerJugador._id, jugador2: segundoJugador._id, fase: faseEnCurso._id};
+        models.Pareja.create(parejaData, function(err, pareja){
+            _sendDocumentIfNotError(res, err, pareja);
         });
     });
+}
+
+var CategoriaAPI = {
+    getCategorias : function(req, res){
+        _populateModel(req, models.Fase, 'categorias', function(err, query, fase){
+            models.Fase.findById(req.param('id'), function(err, faseSinPopular){
+                helpers.addMeta(req, fase.categorias, faseSinPopular.categorias.length, function(data){
+                    _sendDocumentIfNotError(res, err, data);
+                });
+            });
+        });
+    },
+    getCategoriasEnCurso : function(req, res){
+        config.getFaseEnCurso(function(err, faseEnCurso){
+            if(err){
+                res.send(404, {error: 'true'});
+            }else{
+                res.redirect('/fases/' + faseEnCurso._id + '/categorias');
+            }
+        });
+    },
+    getCategoria: function(req, res){
+        var idCategoria = req.param('id');
+        models.Categoria.findById(ObjectId.fromString(idJugador), function(err, doc){
+            _sendDocumentIfNotError(res, err, doc);
+        });
+    }
 };
 
-exports.categorias = function(req, res){
-    _populateModel(req, models.Fase, 'categorias', function(err, fase){
-        res.send(fase.categorias);
-    });
+
+var GrupoAPI = {
+    getGrupos : function(req, res){
+        _populateModel(req, models.Categoria, 'grupos', function(err, query, categoria){
+            models.Categoria.findById(req.param('id'), function(err, categoriaSinPopular){
+                helpers.addMeta(req, categoria.grupos, categoriaSinPopular.grupos.length , function(data){
+                    _sendDocumentIfNotError(res, err, data);
+                });
+            });
+        });
+    }
 }
 
-exports.categoriasEnCurso = function(req, res){
-    config.getFaseEnCurso(function(faseEnCurso){
-        res.redirect('/fases/' + faseEnCurso._id + '/categorias');
-    });
-}
-
-exports.grupos = function(req, res){
-    _populateModel(req, models.Categoria, 'grupos', function(err, categoria){
-        res.send(categoria.grupos);
-    });
-}
-
-exports.parejasWithinGroup = function(req, res){
-    _populateModel(req, models.Grupo, 'parejas', function(err, grupo){
-        res.send(grupo.parejas);
-    });
+var PartidoAPI = {
+    getPartidos : function(req, res){
+        _populateModel(req, models.Grupo, 'partidos', function(err, query, grupo){
+            models.Grupo.findById(req.param('id'), function(err, grupoSinPopular){
+                helpers.addMeta(req, grupo.partidos, grupoSinPopular.partidos.length , function(data){
+                    _sendDocumentIfNotError(res, err, data);
+                });
+            });
+        });
+    }
 }
 
 function _populateModel(req, model, modelToPopulate, callback){
-    id = req.param('id');
-    model.findById(ObjectId.fromString(id))
-         .populate(modelToPopulate)
-         .exec(function(err, doc){
-            callback(err, doc);
-         });
+    var id = req.param('id');
+    var paginateOpts = {limit: req.query.limit, skip: req.query.offset};
+    var query = model
+        .findById(ObjectId.fromString(id))
+        .populate({
+            path: modelToPopulate,
+            options: paginateOpts
+        });
+        query.exec(function(err, doc){
+            callback(err, query, doc);
+        });
 }
 
-function _sendDocumentIfNotErrorWithModel(model, res){
-    model.find(function(err, doc){
+function _sendDocumentIfNotErrorWithModel(model, req, res){
+    var paginateOpts = {limit: req.query.limit, offset: req.query.offset};
+    model.paginate(paginateOpts, function(err, doc){
         _sendDocumentIfNotError(res, err, doc);
     });
 }
@@ -107,3 +176,11 @@ function _sendDocumentIfNotError(res, err, doc){
         res.send(doc);
     }
 }
+
+
+exports.FaseAPI = FaseAPI;
+exports.CategoriaAPI = CategoriaAPI;
+exports.GrupoAPI = GrupoAPI;
+exports.ParejaAPI = ParejaAPI;
+exports.JugadorAPI = JugadorAPI;
+exports.PartidoAPI = PartidoAPI;

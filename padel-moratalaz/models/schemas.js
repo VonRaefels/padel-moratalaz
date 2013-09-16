@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var config = require('../config/config');
-
+var helpers = require('./helpers');
 
 mongoose.connect(config.dbLocation);
 
@@ -41,7 +41,8 @@ var GrupoSchema = new Schema(
     {
         _creator    : {type: Number, ref: 'Categoria'},
         name        : String,
-        parejas     : [{type: ObjectId, ref: 'Pareja'}]
+        parejas     : [{type: ObjectId, ref: 'Pareja'}],
+        partidos    : [{type: ObjectId, ref: 'Partido'}]
     },
     {
         collection  : 'Grupo'
@@ -51,9 +52,9 @@ var GrupoSchema = new Schema(
 var ParejaSchema = new Schema(
     {
         _creator    : {type: Number, ref: 'Grupo'},
-        jugador1    : ObjectId,
-        jugador2    : ObjectId,
-        fase        : ObjectId
+        jugador1    : {_id: ObjectId, name: String, sexo: String},
+        jugador2    : {_id: ObjectId, name: String, sexo: String},
+        asginada    : Boolean
     },
     {
         collection  : 'Pareja'
@@ -74,12 +75,25 @@ var JugadorSchema = new Schema(
     }
 );
 
-
+var PartidoSchema = new Schema(
+    {
+        _creator    : {type: Number, ref: 'Grupo'},
+        resultado   : String,
+        pareja1     : ObjectId,
+        pareja2     : ObjectId
+    },
+    {
+        collection  : 'Partido'
+    }
+);
 
 module.exports.Fase = mongoose.model('Fase', FaseSchema);
 module.exports.Jugador = mongoose.model('Jugador', JugadorSchema);
 module.exports.Pareja = mongoose.model('Pareja', ParejaSchema);
 module.exports.Categoria = mongoose.model('Categoria', CategoriaSchema);
 module.exports.Grupo = mongoose.model('Grupo', GrupoSchema);
+module.exports.Partido = mongoose.model('Partido', PartidoSchema);
 
 module.exports.Config =  mongoose.model('Configuration', ConfigSchema);
+
+helpers.Helpers.initHelpers();
