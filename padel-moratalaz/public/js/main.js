@@ -345,14 +345,15 @@ App = {
     faseEnCurso: null,
     categoriasEnCurso: null,
     categoriaListViewCached: null,
+    router: null,
+    viewCache: new ViewCache(),
     init: function(){
         Fase.getFaseEnCurso(function(fase){
             App.faseEnCurso = fase;
         });
-        Categorias.getCategoriasEnCurso(function(categorias){
-            App.categoriasEnCurso = categorias;
-            App.categoriasEnCurso.display();
-        });
+        App.router = new Router();
+        Backbone.history.start();
+        App.router.navigate('categorias', {trigger: true, replace: true});
     }
 }
 
