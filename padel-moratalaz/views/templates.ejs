@@ -6,9 +6,9 @@
         <label name="grupo">{{name}}</label>
 </script>
 
-<script type="text/x-handlebars-template" id="parejas1-template">
-    <label>Categoría: {{categoria.name}}</label>
-    <label>Grupo: {{grupo.name}}</label>
+<script type="text/x-handlebars-template" id="parejas-template">
+    <p>Categoría: {{categoria.name}}</p>
+    <p>Grupo: {{grupo.name}}</p>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -20,18 +20,35 @@
         <tbody>
         </tbody>
     </table>
-</script>
-
-<script type="text/x-handlebars-template" id="pareja1-template">
-    <th></th>
-    <th>{{jugador1.name}}</th>
-    <th>{{jugado2.name}}</th>
-</script>
-
-<script type="text/x-handlebars-template" id="parejas-template">
-    <label>Categoría:</label>
+    <button id="volver-ranking" type="button" class="btn btn-default">Volver</button>
+    <button id="partidos" type="button" class="btn btn-default">Partidos</button>
 </script>
 
 <script type="text/x-handlebars-template" id="pareja-template">
-    <label>Pareja:</label>
+    <td></td>
+    <td>{{jugador1.name}}</td>
+    <td>{{jugador2.name}}</td>
+</script>
+
+<script type="text/x-handlebars-template" id="partidos-template">
+    <p>Categoría: {{categoria.name}}</p>
+    <p>Grupo: {{grupo.name}}</p>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Pareja1</th>
+                <th>Resultado</th>
+                <th>Pareja2</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <button id="volver-ranking" type="button" class="btn btn-default">Volver</button>
+</script>
+
+<script type="text/x-handlebars-template" id="partido-template">
+    <td>{{pareja1.jugador1.name}}/{{pareja1.jugador2.name}}</td>
+    <td>{{resultado}}</td>
+    <td>{{pareja2.jugador1.name}}/{{pareja2.jugador2.name}}</td>
 </script>

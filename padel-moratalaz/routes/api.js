@@ -57,9 +57,9 @@ var ParejaAPI = {
     getParejasWithinGroup : function(req, res){
         _populateModel(req, models.Grupo, 'parejas', function(err, query, grupo){
             var parejas = grupo.parejas;
-            helpers.populateParejas(parejas, function(){
+            helpers.populateParejas(parejas, function(parejas){
                 models.Grupo.findById(req.param('id'), function(err, grupoSinPopular){
-                    helpers.addMeta(req, grupo.parejas, grupoSinPopular.parejas.length, function(data){
+                    helpers.addMeta(req, parejas, grupoSinPopular.parejas.length, function(data){
                         _sendDocumentIfNotError(res, err, data);
                     });
                 });
@@ -68,8 +68,10 @@ var ParejaAPI = {
     },
     getPareja : function(req, res){
         idPareja = req.param('id');
-        models.Pareja.findById(ObjectId.fromString(idPareja), function(err, doc){
-            _sendDocumentIfNotError(res, err, doc);
+        models.Pareja.findById(ObjectId.fromString(idPareja), function(err, pareja){
+            helpers.populatePareja(pareja, function(parejaPopulada){
+                _sendDocumentIfNotError(res, err, parejaPopulada);
+            });
         });
     }
 };

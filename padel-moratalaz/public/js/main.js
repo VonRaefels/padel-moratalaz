@@ -4,7 +4,7 @@ var Fase = Backbone.Model.extend({
     idAttribute: '_id'
 });
 
-var Fases = Backbone.Model.extend({
+var Fases = Backbone.Collection.extend({
     model: Fase,
     url: '/fases'
 });
@@ -21,7 +21,9 @@ var Categoria = Backbone.Model.extend({
     urlRoot: function(){
         return '/fases/' + this.idFase + '/categorias';
     },
-    url: '/categoria/' + this.id,
+    url: function(){
+        return '/categoria/' + this.id;
+    },
     initialize: function(data, options){
         this.idFase = options.idFase;
     }
@@ -33,20 +35,36 @@ var Grupo = Backbone.Model.extend({
     },
     idAtrribute: '_id',
     urlRoot: function(){
-        return '/categorias/' + this.idAtrribute + '/grupos';
+        return '/categorias/' + this.id + '/grupos';
     },
-    url: '/grupos/' + this.id
+    url: function(){
+        return '/grupos/' + this.id;
+    }
 });
 
 var Pareja = Backbone.Model.extend({
+    initialize: function(){
+    },
+    idAttribute: '_id',
+    urlRoot: function(){
+        return '/grupos/' + this.get('_idGrupo') + '/parejas';
+    },
+    url: function(){
+        return '/parejas/' + this.id;
+    }
+});
+
+var Partido = Backbone.Model.extend({
     initialize: function(data, options){
         this.idGrupo = options.idGrupo;
     },
     idAttribute: '_id',
     urlRoot: function(){
-        return '/grupos/' + this.idAttribute + '/parejas';
+        return '/grupos/' + this.id + '/partidos';
     },
-    url: '/parejas/' + this.idAttribute
+    url: function(){
+        return '/partidos/' + this.id;
+    }
 });
 
 var Grupos = Backbone.Collection.extend({
@@ -72,8 +90,10 @@ var Categorias = Backbone.Collection.extend({
         return response.data;
     },
     display: function(){
-        var categoriaListView = new CategoriaListView({collection: this}).render();
-        $('#ranking-content').html(categoriaListView.el);
+        if(App.categoriaListViewCached == null){
+            App.categoriaListViewCached = new CategoriaListView({collection: this}).render().el;
+        }
+        $('#ranking-content').html(App.categoriaListViewCached);
     },
     initialize: function(data, options){
         this.idFase = options.idFase;
@@ -93,9 +113,23 @@ var Parejas = Backbone.Collection.extend({
     }
 });
 
+var Partidos = Backbone.Collection.extend({
+    model: Partido,
+    url: function(){
+        return '/grupos/' + this.idGrupo + '/partidos';
+    },
+    parse: function(response, options){
+        var partidos = response.data;
+        return partidos;
+    },
+    initialize: function(data, options){
+        this.idGrupo = options.idGrupo;
+    }
+});
+
 var CategoriaListView = Backbone.View.extend({
     tagName: 'ul',
-    className: 'categorias',
+    id: 'categorias',
     initialize: function(){
         _.bindAll(this, 'renderItem');
     },
@@ -111,10 +145,10 @@ var CategoriaListView = Backbone.View.extend({
 });
 
 var CategoriaView = Backbone.View.extend({
-    id              : function(){ return this.model.id; },
+    id: function(){ return this.model.id; },
     tagName: 'li',
     className: 'categoria',
-    template        : Handlebars.compile($('#categoria-template').html()),
+    template: Handlebars.compile($('#categoria-template').html()),
     events: {
         'click label[name=categoria]': 'clicked'
     },
@@ -123,7 +157,7 @@ var CategoriaView = Backbone.View.extend({
         var idCategoria = this.model.get('_id');
         var model = this.model.attributes;
         var $el = this.$el;
-        var $gruposElCollection = $el.find('.grupos');
+        var $gruposElCollection = $el.find('#grupos');
         if(0 == $gruposElCollection.length){
             var grupos = new Grupos([], {idCategoria: idCategoria});
             grupos.fetch({success: function(collection, response, options){
@@ -135,17 +169,17 @@ var CategoriaView = Backbone.View.extend({
             $gruposEl.toggle();
         }
     },
-    render          : function(){
+    render: function(){
         this.$el.append(this.template(this.model.toJSON()));
         return this;
     },
-    initialize      : function(){
+    initialize: function(){
     }
 });
 
 var GrupoListView = Backbone.View.extend({
     tagName: 'ul',
-    className: 'grupos',
+    id: 'grupos',
     initialize: function(options){
         this.categoria = options.categoria;
         _.bindAll(this, 'renderItem');
@@ -181,7 +215,9 @@ var GrupoView = Backbone.View.extend({
         parejas.fetch({success: function(collection, response, options){
             var parejaListView = new ParejaListView({collection: collection, categoria: categoria, grupo: grupo});
             parejaListView.render();
-            $('#ranking-content').html(parejaListView.el);
+            var $rankingContent = $('#ranking-content');
+            App.categoriaListViewCached = $($rankingContent.find('#categorias')[0]).detach();
+            $rankingContent.html(parejaListView.el);
         }});
     },
     template: Handlebars.compile($('#grupo-template').html()),
@@ -197,21 +233,49 @@ var ParejaListView = Backbone.View.extend({
     initialize: function(options){
         this.grupo = options.grupo;
         this.categoria = options.categoria;
-        console.log(options);
 
         _.bindAll(this, 'renderItem');
     },
     renderItem: function(model){
-        var parejaView = new GrupoView({model: model});
+        var parejaView = new ParejaView({model: model});
         parejaView.render();
-        $($(this.el).find('tbody')[0]).append(parejaView.el);
+        $(this.$el.find('tbody')[0]).append(parejaView.el);
     },
-    template: Handlebars.compile($('#parejas_template')),
+    template: Handlebars.compile($('#parejas-template').html()),
     render: function(){
         var templateData = {categoria: this.categoria, grupo: this.grupo};
-        // this.$el.append(this.template(templateData));
+        this.$el.append(this.template(templateData));
         this.collection.each(this.renderItem);
         return this;
+    },
+    events: {
+        'click #volver-ranking': 'volver',
+        'click #partidos': 'mostrarPartidos'
+    },
+    volver: function(ev){
+        ev.preventDefault();
+        App.categoriasEnCurso.display();
+    },
+    mostrarPartidos: function(ev){
+        ev.preventDefault();
+        var partidosCollection = new Partidos([], {idGrupo: this.grupo._id});
+        partidosCollection.fetch({success: function(collection, response, options){
+            var partidos = collection.models;
+            var cb = _.after(partidos.length, function(){
+                console.log('finished');
+            });
+            partidos.forEach(function(partido){
+                var pareja1 = new Pareja({_id: partido.get('pareja1'), _idGrupo: partido.get('_id')});
+                pareja1.fetch({success: function(model, response, options){
+                    partido.set({pareja1: model.attributes});
+                    var pareja2 = new Pareja({_id: partido.get('pareja2')});
+                    pareja2.fetch({success: function(model2, response, options){
+                        partido.set({pareja2: model2.attributes});
+                        cb();
+                    }});
+                }});
+            });
+        }});
     }
 });
 
@@ -221,7 +285,20 @@ var ParejaView = Backbone.View.extend({
     id: function(){
         return this.model.get('_id');
     },
-    template: Handlebars.compile($('#pareja_template')),
+    template: Handlebars.compile($('#pareja-template').html()),
+    render: function(){
+        this.$el.append(this.template(this.model.toJSON()));
+        return this;
+    }
+});
+
+var PartidoView = Backbone.View.extend({
+    tagName: 'tr',
+    className: 'partido',
+    id: function(){
+        return this.model.get('_id');
+    },
+    template: Handlebars.compile($('partido-template').html()),
     render: function(){
         this.$el.append(this.template(this.model.toJSON()));
         return this;
@@ -239,6 +316,7 @@ Categorias.getCategoriasEnCurso = function(callback){
 App = {
     faseEnCurso: null,
     categoriasEnCurso: null,
+    categoriaListViewCached: null,
     init: function(){
         Fase.getFaseEnCurso(function(fase){
             App.faseEnCurso = fase;

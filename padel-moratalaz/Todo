@@ -11,3 +11,12 @@
 -> Código duplicado en helpers y api.
 
 -> Quitar parejas en curso?
+
+
+--------------cliente---------------------
+
+
+-> Quitar options en modelos de backbonejs
+-> Problema ids en los modelos de backbonejs
+-> Mejor sistema de cache de vistas...
+-> Backbone bootsratp....??

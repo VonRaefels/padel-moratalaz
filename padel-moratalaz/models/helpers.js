@@ -92,7 +92,9 @@ var Helpers = {
         callback(doc);
     },
     populateParejas: function(parejas, callback){
-        var cb = _.after(parejas.length, callback);
+        var cb = _.after(parejas.length, function(){
+            callback(parejas);
+        });
         parejas.forEach(function(pareja){
             Helpers.populatePareja(pareja, cb);
         });
