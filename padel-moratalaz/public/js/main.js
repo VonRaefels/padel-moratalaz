@@ -258,11 +258,16 @@ var ParejaListView = Backbone.View.extend({
     },
     mostrarPartidos: function(ev){
         ev.preventDefault();
+        var categoria = this.categoria;
+        var grupo = this.grupo;
         var partidosCollection = new Partidos([], {idGrupo: this.grupo._id});
         partidosCollection.fetch({success: function(collection, response, options){
             var partidos = collection.models;
             var cb = _.after(partidos.length, function(){
-                console.log('finished');
+                var partidoListView = new PartidoListView({collection: collection, categoria: categoria, grupo: grupo});
+                partidoListView.render();
+                var $rankingContent = $('#ranking-content');
+                $rankingContent.html(partidoListView.el);
             });
             partidos.forEach(function(partido){
                 var pareja1 = new Pareja({_id: partido.get('pareja1'), _idGrupo: partido.get('_id')});
@@ -298,11 +303,34 @@ var PartidoView = Backbone.View.extend({
     id: function(){
         return this.model.get('_id');
     },
-    template: Handlebars.compile($('partido-template').html()),
+    template: Handlebars.compile($('#partido-template').html()),
     render: function(){
         this.$el.append(this.template(this.model.toJSON()));
         return this;
     }
+});
+
+var PartidoListView = Backbone.View.extend({
+    tagName: 'div',
+    id: "partidos",
+    initialize: function(options){
+        this.grupo = options.grupo;
+        this.categoria = options.categoria;
+
+        _.bindAll(this, 'renderItem');
+    },
+    renderItem: function(model){
+        var partidoView = new PartidoView({model: model});
+        partidoView.render();
+        $(this.$el.find('tbody')[0]).append(partidoView.el);
+    },
+    template: Handlebars.compile($('#partidos-template').html()),
+    render: function(){
+        var templateData = {categoria: this.categoria, grupo: this.grupo};
+        this.$el.append(this.template(templateData));
+        this.collection.each(this.renderItem);
+        return this;
+    },
 });
 
 
