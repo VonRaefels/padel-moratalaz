@@ -15,6 +15,7 @@
 
 --------------cliente---------------------
 
--> Mejor sistema de cache de vistas...
--> Backbone bootsratp....??
 -> Pasar modelos en vez de ids a las colecciones
+-> Mostrar mensaje si no hay datos
+-> Paginacion en las tablas, categorias....
+-> Pasar fase a las categorias y quitar la referencia a fase en curso...
