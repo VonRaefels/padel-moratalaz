@@ -19,23 +19,21 @@ Fase.getFaseEnCurso = function(callback){
 var Categoria = Backbone.Model.extend({
     idAttribute: '_id',
     urlRoot: function(){
-        return '/fases/' + this.idFase + '/categorias';
+        return '/fases/' + this.get('idFase') + '/categorias';
     },
     url: function(){
         return '/categoria/' + this.id;
     },
-    initialize: function(data, options){
-        this.idFase = options.idFase;
+    initialize: function(){
     }
 });
 
 var Grupo = Backbone.Model.extend({
-    initialize: function(data, options){
-        this.idCategoria = options.idCategoria;
+    initialize: function(){
     },
-    idAtrribute: '_id',
+    idAttribute: '_id',
     urlRoot: function(){
-        return '/categorias/' + this.id + '/grupos';
+        return '/categorias/' + this.get('idCategoria') + '/grupos';
     },
     url: function(){
         return '/grupos/' + this.id;
@@ -55,12 +53,11 @@ var Pareja = Backbone.Model.extend({
 });
 
 var Partido = Backbone.Model.extend({
-    initialize: function(data, options){
-        this.idGrupo = options.idGrupo;
+    initialize: function(){
     },
     idAttribute: '_id',
     urlRoot: function(){
-        return '/grupos/' + this.id + '/partidos';
+        return '/grupos/' + this.get('_idGrupo') + '/partidos';
     },
     url: function(){
         return '/partidos/' + this.id;
@@ -84,19 +81,13 @@ var Grupos = Backbone.Collection.extend({
 var Categorias = Backbone.Collection.extend({
     model: Categoria,
     url: function(){
-        return '/fases/' + this.idFase + '/categorias';
+        return '/fases/' + this.fase.get('_id') + '/categorias';
     },
     parse: function(response, options){
         return response.data;
     },
-    display: function(){
-        if(App.categoriaListViewCached == null){
-            App.categoriaListViewCached = new CategoriaListView({collection: this}).render().el;
-        }
-        $('#ranking-content').html(App.categoriaListViewCached);
-    },
     initialize: function(data, options){
-        this.idFase = options.idFase;
+        this.fase = options.fase;
     }
 });
 
@@ -129,7 +120,8 @@ var Partidos = Backbone.Collection.extend({
 
 var CategoriaListView = Backbone.View.extend({
     tagName: 'ul',
-    id: 'categorias',
+    id: 'view',
+    className: 'categorias',
     initialize: function(){
         _.bindAll(this, 'renderItem');
     },
@@ -155,7 +147,7 @@ var CategoriaView = Backbone.View.extend({
     clicked: function(ev){
         ev.preventDefault();
         var idCategoria = this.model.get('_id');
-        var model = this.model.attributes;
+        var model = this.model;
         var $el = this.$el;
         var $gruposElCollection = $el.find('#grupos');
         if(0 == $gruposElCollection.length){
@@ -210,15 +202,8 @@ var GrupoView = Backbone.View.extend({
     clicked: function(ev){
         ev.preventDefault();
         var categoria = this.categoria;
-        var grupo = this.model.attributes;
-        var parejas = new Parejas([], {idGrupo: this.model.get('_id')});
-        parejas.fetch({success: function(collection, response, options){
-            var parejaListView = new ParejaListView({collection: collection, categoria: categoria, grupo: grupo});
-            parejaListView.render();
-            var $rankingContent = $('#ranking-content');
-            App.categoriaListViewCached = $($rankingContent.find('#categorias')[0]).detach();
-            $rankingContent.html(parejaListView.el);
-        }});
+        var grupo = this.model;
+        events.trigger('parejas', categoria, grupo);
     },
     template: Handlebars.compile($('#grupo-template').html()),
     render: function(){
@@ -229,6 +214,7 @@ var GrupoView = Backbone.View.extend({
 
 var ParejaListView = Backbone.View.extend({
     tagName: 'div',
+    id: 'view',
     className: 'parejas',
     initialize: function(options){
         this.grupo = options.grupo;
@@ -254,33 +240,13 @@ var ParejaListView = Backbone.View.extend({
     },
     volver: function(ev){
         ev.preventDefault();
-        App.categoriasEnCurso.display();
+        events.trigger('categorias', App.faseEnCurso);
     },
     mostrarPartidos: function(ev){
         ev.preventDefault();
         var categoria = this.categoria;
         var grupo = this.grupo;
-        var partidosCollection = new Partidos([], {idGrupo: this.grupo._id});
-        partidosCollection.fetch({success: function(collection, response, options){
-            var partidos = collection.models;
-            var cb = _.after(partidos.length, function(){
-                var partidoListView = new PartidoListView({collection: collection, categoria: categoria, grupo: grupo});
-                partidoListView.render();
-                var $rankingContent = $('#ranking-content');
-                $rankingContent.html(partidoListView.el);
-            });
-            partidos.forEach(function(partido){
-                var pareja1 = new Pareja({_id: partido.get('pareja1'), _idGrupo: partido.get('_id')});
-                pareja1.fetch({success: function(model, response, options){
-                    partido.set({pareja1: model.attributes});
-                    var pareja2 = new Pareja({_id: partido.get('pareja2')});
-                    pareja2.fetch({success: function(model2, response, options){
-                        partido.set({pareja2: model2.attributes});
-                        cb();
-                    }});
-                }});
-            });
-        }});
+        events.trigger('partidos', categoria, grupo);
     }
 });
 
@@ -312,7 +278,8 @@ var PartidoView = Backbone.View.extend({
 
 var PartidoListView = Backbone.View.extend({
     tagName: 'div',
-    id: "partidos",
+    id: 'view',
+    className: 'partidos',
     initialize: function(options){
         this.grupo = options.grupo;
         this.categoria = options.categoria;
@@ -330,7 +297,13 @@ var PartidoListView = Backbone.View.extend({
         this.$el.append(this.template(templateData));
         this.collection.each(this.renderItem);
         return this;
+    },events: {
+        'click #volver-ranking': 'volver'
     },
+    volver: function(ev){
+        ev.preventDefault();
+        events.trigger('parejas', this.categoria, this.grupo);
+    }
 });
 
 
@@ -347,13 +320,18 @@ App = {
     categoriaListViewCached: null,
     router: null,
     viewCache: new ViewCache(),
+    showView: function(view){
+        $('#view').detach();
+        $('#ranking-content').html(view);
+    },
     init: function(){
-        Fase.getFaseEnCurso(function(fase){
-            App.faseEnCurso = fase;
-        });
         App.router = new Router();
         Backbone.history.start();
-        App.router.navigate('categorias', {trigger: true, replace: true});
+
+        Fase.getFaseEnCurso(function(fase){
+            App.faseEnCurso = fase;
+            events.trigger('categorias', fase);
+        });
     }
 }
 

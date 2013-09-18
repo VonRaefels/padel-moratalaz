@@ -29,7 +29,7 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/', web.index);
+app.get('/ranking', web.ranking);
 
 app.get('/fases', api.FaseAPI.getFases);
 app.get('/fases/:id', api.FaseAPI.getFase);
