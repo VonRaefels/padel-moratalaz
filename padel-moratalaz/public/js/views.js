@@ -83,7 +83,7 @@ var GrupoView = Backbone.View.extend({
         ev.preventDefault();
         var categoria = this.categoria;
         var grupo = this.model;
-        events.trigger('parejas', categoria, grupo);
+        events.trigger('parejas', categoria, grupo, {limit: "5"});
     },
     template: Handlebars.compile($('#grupo-template').html()),
     render: function(){
@@ -109,14 +109,16 @@ var ParejaListView = Backbone.View.extend({
     },
     template: Handlebars.compile($('#parejas-template').html()),
     render: function(){
-        var templateData = {categoria: this.categoria, grupo: this.grupo};
+        var templateData = {categoria: this.categoria.attributes, grupo: this.grupo.attributes, meta: this.collection.meta};
         this.$el.append(this.template(templateData));
         this.collection.each(this.renderItem);
         return this;
     },
     events: {
         'click #volver-ranking': 'volver',
-        'click #partidos': 'mostrarPartidos'
+        'click #partidos': 'mostrarPartidos',
+        'click #nextPage': 'nextPage',
+        'click #previousPage': 'previousPage'
     },
     volver: function(ev){
         ev.preventDefault();
@@ -127,6 +129,18 @@ var ParejaListView = Backbone.View.extend({
         var categoria = this.categoria;
         var grupo = this.grupo;
         events.trigger('partidos', categoria, grupo);
+    },
+    nextPage: function(ev){
+        var $pagination = $('.pagination');
+        var offset = parseInt($pagination.attr('offset'));
+        var limit = parseInt($pagination.attr('limit'));
+        events.trigger('parejas', this.categoria, this.grupo, {offset: offset + limit, limit: limit});
+    },
+    previousPage: function(ev){
+        var $pagination = $('.pagination');
+        var offset = parseInt($pagination.attr('offset'));
+        var limit = parseInt($pagination.attr('limit'));
+        events.trigger('parejas', this.categoria, this.grupo, {offset: offset - limit, limit: limit});
     }
 });
 
@@ -173,7 +187,7 @@ var PartidoListView = Backbone.View.extend({
     },
     template: Handlebars.compile($('#partidos-template').html()),
     render: function(){
-        var templateData = {categoria: this.categoria, grupo: this.grupo};
+        var templateData = {categoria: this.categoria.attributes, grupo: this.grupo.attributes, meta: this.collection.meta};
         this.$el.append(this.template(templateData));
         this.collection.each(this.renderItem);
         return this;

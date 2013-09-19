@@ -1,5 +1,3 @@
--> Partidos
-
 -> Administración
 -> Auth en la api
 -> Csrf en formulario...
@@ -12,6 +10,9 @@
 
 -> Quitar parejas en curso?
 
+-> Cachear
+
+-> Bug paginacion con datos negativos/ raros...
 
 --------------cliente---------------------
 

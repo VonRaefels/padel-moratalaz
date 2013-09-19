@@ -20,6 +20,16 @@
         <tbody>
         </tbody>
     </table>
+    <ul class="pagination" limit="{{meta.limit}}" offset="{{meta.offset}}">
+        <li id="previousPage" {{#if meta.firstPage}}class="disabled"{{/if}}><a href="#">&laquo;</a></li>
+        {{#times meta.totalPages }}
+            <li {{#compare ../meta.page "===" this}}
+                class="active"
+                {{/compare}}
+                ><a href="#">{{this}}</a></li>
+        {{/times}}
+        <li id="nextPage"{{#if meta.lastPage}}class="disabled"{{/if}}><a href="#">&raquo;</a></li>
+    </ul>
     <button id="volver-ranking" type="button" class="btn btn-default">Volver</button>
     <button id="partidos" type="button" class="btn btn-default">Partidos</button>
 </script>
@@ -44,6 +54,16 @@
         <tbody>
         </tbody>
     </table>
+    <ul class="pagination" size="{{meta.size}}" offset="{{meta.offset}}">
+        <li id="previousPage" {{#if meta.firstPage}}class="disabled"{{/if}}><a href="#">&laquo;</a></li>
+        {{#times meta.totalPages }}
+            <li {{#compare ../meta.page "===" 1}}
+                class="active"
+                {{/compare}}
+                ><a href="#">{{this}}</a></li>
+        {{/times}}
+        <li id="nextPage"{{#if meta.lastPage}}class="disabled"{{/if}}><a href="#">&raquo;</a></li>
+    </ul>
     <button id="volver-ranking" type="button" class="btn btn-default">Volver</button>
 </script>
 

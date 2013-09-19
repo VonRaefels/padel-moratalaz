@@ -70,7 +70,7 @@ var Grupos = Backbone.Collection.extend({
         return '/categorias/' + this.idCategoria + '/grupos';
     },
     parse: function(response, options){
-        //Handle pagination...
+        this.meta = this.addMeta(response);
         return response.data;
     },
     initialize: function(data, options){
@@ -84,6 +84,7 @@ var Categorias = Backbone.Collection.extend({
         return '/fases/' + this.fase.get('_id') + '/categorias';
     },
     parse: function(response, options){
+        this.meta = this.addMeta(response);
         return response.data;
     },
     initialize: function(data, options){
@@ -104,6 +105,7 @@ var Parejas = Backbone.Collection.extend({
         return '/grupos/' + this.idGrupo + '/parejas';
     },
     parse: function(response, options){
+        this.meta = this.addMeta(response);
         return response.data;
     },
     initialize: function(data, options){
@@ -118,6 +120,7 @@ var Partidos = Backbone.Collection.extend({
     },
     parse: function(response, options){
         var partidos = response.data;
+        this.meta = this.addMeta(response);
         return partidos;
     },
     initialize: function(data, options){
@@ -125,3 +128,24 @@ var Partidos = Backbone.Collection.extend({
     }
 });
 
+Backbone.Collection.prototype.addMeta = function(response){
+    var meta = response.meta;
+    meta.size = response.data.length;
+    meta.limit = parseInt(meta.limit);
+    meta.offset = parseInt(meta.offset);
+    var totalPages = Math.floor(meta.totalRecords / meta.limit);
+    console.log(meta);
+    if((meta.totalRecords % meta.limit) > 0){
+        totalPages++;
+    }
+    meta.totalPages = totalPages;
+    var page = Math.floor(meta.offset / meta.size) + 1;
+    meta.page = page;
+    if(page == 1){
+        meta.firstPage = true;
+    }
+    if(page == totalPages){
+        meta.lastPage = true;
+    }
+    return meta;
+}
