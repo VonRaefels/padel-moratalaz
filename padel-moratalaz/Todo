@@ -20,3 +20,6 @@
 -> Mostrar mensaje si no hay datos
 -> Paginacion en las tablas, categorias....
 -> Pasar fase a las categorias y quitar la referencia a fase en curso...
+-> Código duplicado en modelos y vistas del cliente.
+-> Controladores para las vistas
+-> Cambiar los eventos con opciones {} en vez de categoria y grupo.

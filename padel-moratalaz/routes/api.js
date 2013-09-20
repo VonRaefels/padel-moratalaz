@@ -152,7 +152,10 @@ var PartidoAPI = {
 
 function _populateModel(req, model, modelToPopulate, callback){
     var id = req.param('id');
-    var paginateOpts = {limit: req.query.limit, skip: req.query.offset};
+    var paginateOpts = {limit: req.query.limit, offset: req.query.offset};
+    paginateOpts = helpers.validateOptions(paginateOpts);
+    paginateOpts.skip = paginateOpts.offset;
+    delete paginateOpts.offset;
     var query = model
         .findById(ObjectId.fromString(id))
         .populate({

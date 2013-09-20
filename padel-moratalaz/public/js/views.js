@@ -1,3 +1,25 @@
+var PageableView = Backbone.View.extend({
+        nextPage : function(ev){
+        var $pagination = $(this.pageableEl);
+        var offset = parseInt($pagination.attr('offset'));
+        var limit = parseInt($pagination.attr('limit'));
+        events.trigger(this.pageableEvent, this.categoria, this.grupo, {offset: offset + limit, limit: limit});
+    },
+    previousPage : function(ev){
+        var $pagination = $(this.pageableEl);
+        var offset = parseInt($pagination.attr('offset'));
+        var limit = parseInt($pagination.attr('limit'));
+        events.trigger(this.pageableEvent, this.categoria, this.grupo, {offset: offset - limit, limit: limit});
+    },
+    navigatePage: function(ev){
+        var $pagination = $(this.pageableEl);
+        var offset = parseInt($pagination.attr('offset'));
+        var limit = parseInt($pagination.attr('limit'));
+        var page = $(ev.target).attr('page');
+        events.trigger(this.pageableEvent, this.categoria, this.grupo, {offset: (page * limit) - limit, limit: limit});
+    }
+});
+
 var CategoriaListView = Backbone.View.extend({
     tagName: 'ul',
     id: 'view',
@@ -92,10 +114,12 @@ var GrupoView = Backbone.View.extend({
     }
 });
 
-var ParejaListView = Backbone.View.extend({
+var ParejaListView = PageableView.extend({
     tagName: 'div',
     id: 'view',
     className: 'parejas',
+    pageableEl: '#pagination-parejas',
+    pageableEvent: 'parejas',
     initialize: function(options){
         this.grupo = options.grupo;
         this.categoria = options.categoria;
@@ -117,8 +141,9 @@ var ParejaListView = Backbone.View.extend({
     events: {
         'click #volver-ranking': 'volver',
         'click #partidos': 'mostrarPartidos',
-        'click #nextPage': 'nextPage',
-        'click #previousPage': 'previousPage'
+        'click #nextPage:not(.disabled)': 'nextPage',
+        'click #previousPage:not(.disabled)': 'previousPage',
+        'click a[page]': 'navigatePage'
     },
     volver: function(ev){
         ev.preventDefault();
@@ -129,18 +154,6 @@ var ParejaListView = Backbone.View.extend({
         var categoria = this.categoria;
         var grupo = this.grupo;
         events.trigger('partidos', categoria, grupo);
-    },
-    nextPage: function(ev){
-        var $pagination = $('.pagination');
-        var offset = parseInt($pagination.attr('offset'));
-        var limit = parseInt($pagination.attr('limit'));
-        events.trigger('parejas', this.categoria, this.grupo, {offset: offset + limit, limit: limit});
-    },
-    previousPage: function(ev){
-        var $pagination = $('.pagination');
-        var offset = parseInt($pagination.attr('offset'));
-        var limit = parseInt($pagination.attr('limit'));
-        events.trigger('parejas', this.categoria, this.grupo, {offset: offset - limit, limit: limit});
     }
 });
 
@@ -170,10 +183,12 @@ var PartidoView = Backbone.View.extend({
     }
 });
 
-var PartidoListView = Backbone.View.extend({
+var PartidoListView = PageableView.extend({
     tagName: 'div',
     id: 'view',
     className: 'partidos',
+    pageableEl: '#pagination-partidos',
+    pageableEvent: 'partidos',
     initialize: function(options){
         this.grupo = options.grupo;
         this.categoria = options.categoria;
@@ -192,7 +207,9 @@ var PartidoListView = Backbone.View.extend({
         this.collection.each(this.renderItem);
         return this;
     },events: {
-        'click #volver-ranking': 'volver'
+        'click #volver-ranking': 'volver',
+        'click #nextPage:not(.disabled)': 'nextPage',
+        'click #previousPage:not(.disabled)': 'previousPage'
     },
     volver: function(ev){
         ev.preventDefault();

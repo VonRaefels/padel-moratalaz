@@ -20,13 +20,13 @@
         <tbody>
         </tbody>
     </table>
-    <ul class="pagination" limit="{{meta.limit}}" offset="{{meta.offset}}">
+    <ul id="pagination-parejas" class="pagination" limit="{{meta.limit}}" offset="{{meta.offset}}">
         <li id="previousPage" {{#if meta.firstPage}}class="disabled"{{/if}}><a href="#">&laquo;</a></li>
         {{#times meta.totalPages }}
             <li {{#compare ../meta.page "===" this}}
                 class="active"
                 {{/compare}}
-                ><a href="#">{{this}}</a></li>
+                ><a href="#" page="{{this}}">{{this}}</a></li>
         {{/times}}
         <li id="nextPage"{{#if meta.lastPage}}class="disabled"{{/if}}><a href="#">&raquo;</a></li>
     </ul>
@@ -54,7 +54,7 @@
         <tbody>
         </tbody>
     </table>
-    <ul class="pagination" size="{{meta.size}}" offset="{{meta.offset}}">
+    <ul id="pagination-partidos" class="pagination" size="{{meta.size}}" offset="{{meta.offset}}">
         <li id="previousPage" {{#if meta.firstPage}}class="disabled"{{/if}}><a href="#">&laquo;</a></li>
         {{#times meta.totalPages }}
             <li {{#compare ../meta.page "===" 1}}

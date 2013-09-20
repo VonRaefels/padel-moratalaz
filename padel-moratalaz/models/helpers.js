@@ -15,7 +15,7 @@ var Helpers = {
             opts = conditions;
             conditions = {};
         }
-
+        opts = Helpers.validateOptions(opts);
         var limit = opts.limit || DEFAULT_LIMIT;
         var offset = opts.offset || DEFAULT_OFFSET;
         var Model = this;
@@ -37,6 +37,7 @@ var Helpers = {
         });
     },
     paginateQuery : function(opts, callback){
+        opts = Helpers.validateOptions(opts);
         var limit = opts.limit || DEFAULT_LIMIT;
         var offset = opts.offset || DEFAULT_OFFSET;
         var query = this.skip(offset).limit(limit);
@@ -63,12 +64,13 @@ var Helpers = {
         query.model = this;
         return query;
     },
-    execWithMeta : function(conditions, opts, callback){4
+    execWithMeta : function(conditions, opts, callback){
         if('function' === typeof opts){
             callback = opts;
             opts = conditions;
             conditions = {};
         }
+        opts = Helpers.validateOptions(opts);
         var limit = opts.limit || DEFAULT_LIMIT;
         var offset = opts.offset || DEFAULT_OFFSET;
 
@@ -85,8 +87,9 @@ var Helpers = {
         });
     },
     addMeta : function (req, records, totalCount, callback){
-        var limit = req.query.limit || DEFAULT_LIMIT;
-        var offset = req.query.offset || DEFAULT_OFFSET;
+        opts = Helpers.validateOptions({limit: req.query.limit, offset: req.query.offset});
+        var limit = opts.limit || DEFAULT_LIMIT;
+        var offset = opts.offset || DEFAULT_OFFSET;
         var metaData = {totalRecords: totalCount, offset: offset, limit: limit};
         var doc = {meta: metaData, data: records};
         callback(doc);
@@ -109,6 +112,11 @@ var Helpers = {
                 }
             });
         });
+    },
+    validateOptions : function(opts){
+        opts.limit = (opts.limit >= 0) ? opts.limit : 0;
+        opts.offset = (opts.offset >= 0) ? opts.offset : 0;
+        return opts;
     }
 }
 
