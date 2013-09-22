@@ -5,14 +5,14 @@
 
 var express = require('express');
 var api = require('./routes/api')
-var web = require('./routes/index');
+var web = require('./routes/web');
 var http = require('http');
 var path = require('path');
 
 var app = express();
 
 // all environments
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 80);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(express.favicon());
@@ -30,6 +30,7 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/ranking', web.ranking);
+app.get('/inscribete', web.inscribete);
 
 app.get('/fases', api.FaseAPI.getFases);
 app.get('/fases/:id', api.FaseAPI.getFase);
@@ -40,7 +41,7 @@ app.get('/jugadores/:id', api.JugadorAPI.getJugador);
 
 app.get('/parejas', api.ParejaAPI.getParejas);
 app.get('/parejas-sin-asignar', api.ParejaAPI.getParejasSinAsignar);
-app.put('/parejas', api.ParejaAPI.addPareja);
+app.post('/parejas', api.ParejaAPI.addPareja);
 app.get('/parejas/:id', api.ParejaAPI.getPareja);
 app.get('/grupos/:id/parejas', api.ParejaAPI.getParejasWithinGroup);
 

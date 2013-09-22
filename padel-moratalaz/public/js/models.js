@@ -44,9 +44,7 @@ var Pareja = Backbone.Model.extend({
     initialize: function(){
     },
     idAttribute: '_id',
-    urlRoot: function(){
-        return '/grupos/' + this.get('_idGrupo') + '/parejas';
-    },
+    urlRoot: '/parejas',
     url: function(){
         return '/parejas/' + this.id;
     }

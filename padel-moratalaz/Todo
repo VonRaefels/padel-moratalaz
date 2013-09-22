@@ -14,6 +14,10 @@
 
 -> Bug paginacion con datos negativos/ raros...
 
+-> Cambiar las rutas de las colecciones /categorias/:id ----> /fases/:id/categorias/:id
+
+-> Validar parejas en el post.
+
 --------------cliente---------------------
 
 -> Pasar modelos en vez de ids a las colecciones
@@ -23,3 +27,4 @@
 -> Código duplicado en modelos y vistas del cliente.
 -> Controladores para las vistas
 -> Cambiar los eventos con opciones {} en vez de categoria y grupo.
+-> Corregir url y urlRoot con los ids, ya que backbone ya coge el id de la coleccion...

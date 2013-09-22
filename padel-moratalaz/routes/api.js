@@ -176,9 +176,9 @@ function _sendDocumentIfNotErrorWithModel(model, req, res){
 
 function _sendDocumentIfNotError(res, err, doc){
     if(err){
-        res.send(404, {error: 'true'});
+        res.json(404, {error: 'true'});
     }else{
-        res.send(doc);
+        res.json(doc);
     }
 }
 
