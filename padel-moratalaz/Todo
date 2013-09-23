@@ -12,6 +12,10 @@
 
 -> Bug paginacion con datos raros...
 
+-> Cambiar las rutas de las colecciones /categorias/:id ----> /fases/:id/categorias/:id
+
+-> Validar parejas en el post.
+
 --------------cliente---------------------
 
 -> Pasar modelos en vez de ids a las colecciones
@@ -24,4 +28,4 @@
 -> Formulario de Inicio
 -> Estilos, Animaciones para la carga de páginas Ajax.
 -> Administración (Importante)
-    -> ..........................
+-> Corregir url y urlRoot con los ids, ya que backbone ya coge el id de la coleccion...
