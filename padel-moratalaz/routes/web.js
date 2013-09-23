@@ -14,30 +14,13 @@ var menuItems = [];
 
 
 exports.index = function(req, res){
-  res.render('index');
+  res.render('index', {menuItems: menuItems, active: '/ranking'});
 };
 
 exports.ranking = function(req, res){
-    var html = '';
-    fileCache.readView('nav-bar', function(err, data){
-        if (err){
-            console.log(err);
-        }else{
-            var navBarHtml = ejs.render(data.toString('utf8', 0, data.length), {menuItems: menuItems, active: '/ranking'});
-            fileCache.readView('ranking', function(err, data){
-                if(err){
-                    console.log(data);
-                }else{
-                    var rankingHtml = ejs.render(data.toString('utf8', 0, data.length)
-                        ,{filename: appRoot + '/views/ranking.ejs'});
-                    html = navBarHtml + rankingHtml;
-                    res.render(html);
-                }
-            });
-        }
-    })
+    res.render('ranking', {menuItems: menuItems, active: '/ranking'});
 }
 
 exports.inscribete = function(req, res){
-    res.render('inscripcion');
+    res.render('inscripcion', {menuItems: menuItems, active: '/inscribete'});
 }
