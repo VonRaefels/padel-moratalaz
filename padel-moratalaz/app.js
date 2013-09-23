@@ -31,6 +31,10 @@ if ('development' == app.get('env')) {
 
 app.get('/ranking', web.ranking);
 app.get('/inscribete', web.inscribete);
+app.get('/historico', web.historico);
+app.get('/galeria', web.galeria);
+app.get('/contacto', web.contacto);
+app.get('/', web.index);
 
 app.get('/fases', api.FaseAPI.getFases);
 app.get('/fases/:id', api.FaseAPI.getFase);

@@ -24,3 +24,15 @@ exports.ranking = function(req, res){
 exports.inscribete = function(req, res){
     res.render('inscripcion', {menuItems: menuItems, active: '/inscribete'});
 }
+
+exports.historico = function(req, res){
+    res.render('historico', {menuItems: menuItems, active: '/historico'});
+}
+
+exports.galeria = function(req, res){
+    res.render('galeria', {menuItems: menuItems, active: '/galeria'});
+}
+
+exports.contacto = function(req, res){
+    res.render('contacto', {menuItems: menuItems, active: '/contacto'});
+}
