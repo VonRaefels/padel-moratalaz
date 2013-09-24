@@ -1,83 +1,110 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Padel Moratalaz</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="../../assets/js/html5shiv.js"></script>
-      <script src="../../assets/js/respond.min.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <%- include nav-bar.ejs %>
-    <div class="panel col-md-10 col-md-offset-1" id="main-content">
-      <div id="content">
-        <div class="page-header">
-          <h1>Inscribete! <small>Inscribe en el ranking!</small></h1>
-        </div>
-        <div id="contenido-formulario" class="row">
-          <div id="jugador1" class="col-md-5 ">
-            <h3>Datos del primer jugador</h3>
+    <head>
+        <title>Padel Moratalaz</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Bootstrap -->
+        <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="css/style.css" rel="stylesheet">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="../../assets/js/html5shiv.js"></script>
+            <script src="../../assets/js/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <%- include nav-bar.ejs %>
+        <div  class="container" id="main-content">
+            <div class="row">
+                <div id="content" class="col-md-10">
+                    <div class="page-header">
+                        <h1>Inscríbete! <small>Inscríbete en el ranking!</small></h1>
+                    </div>
+                    <div id="contenido-formulario" class="row">
+                    <% for(var i=1;i <= 2; i++){ %>
+                        <% if(i==1){ %>
+                        <div id="jugador<%= i %>" class="col-md-5 ">
+                            <h3>Datos del primer jugador</h3>
+                        <% }else{ %>
+                        <div id="jugador<%= i %>" class="col-md-5 col-md-offset-1">
+                            <h3>Datos del segundo jugador</h3>
+                            <% } %>
+                            </br>
+                            <div class="form-group">
+                                <label for="nombre<%= i %>">Nombre completo</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon glyphicon glyphicon-user"></span>
+                                    <input type="text" class="form-control" id="nombre<%= i %>" placeholder="Nombre completo">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email<%= i %>">Dirección de email</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon">@</span>
+                                    <input type="email" class="form-control" id="email<%= i %>" placeholder="Introduzca su email">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="tel<%= i %>">Número de telefono</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon glyphicon glyphicon-earphone"></span>
+                                    <input type="tel" class="form-control" id="tel<%= i %>" placeholder="Fijo ó móvil">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 form-group">
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="sexo<%= i %>" id="hombre<%= i %>" value="v" checked>
+                                            Hombre
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="sexo<%= i %>" id="mujer<%= i %>" value="m">
+                                            Mujer
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 form-group">
+                                    <label for="nivel<%= i %>" >Nivel</label>
+                                    <select class="form-control" id="nivel<%= i %>">
+                                        <option value="a">Alto</option>
+                                        <option value="m">Medio</option>
+                                        <option value="b">Bajo</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 col-md-offset-1 form-group">
+                                    <label for="edad<%= i %>" >Edad</label>
+                                    <input type="number" class="form-control" id="edad<%= i %>" placeholder="Edad">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <button type="button" id="reset<%= i %>" class="btn-sm btn btn-warning">
+                                        <span class="glyphicon glyphicon-remove"></span>&nbspReset
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
             </br>
-            <div class="form-group">
-              <label for="nombre1">Nombre completo</label>
-              <input type="email" class="form-control" id="nombre1" placeholder="Nombre completo">
+            <div id="buttons" class="row">
+                <div class="well col-md-4 col-md-offset-3">
+                    <button type="button" id="inscripcion" class="btn btn-primary btn-lg btn-block">
+                        <span class="glyphicon glyphicon-ok-sign"></span>&nbsp&nbsp
+                        Inscríbete!
+                    </button>
+                </div>
             </div>
-            <div class="form-group">
-              <label for="email1">Dirección de email</label>
-              <input type="text" class="form-control" id="email1" placeholder="Introduzca su email">
-            </div>
-            <div class="radio">
-              <label>
-                <input type="radio" name="sexo1" id="hombre1" value="hombre" checked>
-                Hombre
-              </label>
-            </div>
-            <div class="radio">
-              <label>
-                <input type="radio" name="sexo1" id="mujer1" value="mujer">
-                Mujer
-              </label>
-            </div>
-          </div>
-          <div id="jugador2" class="col-md-5 col-md-offset-1">
-            <h3>Datos del segundo jugador</h3>
-            </br>
-            <div class="form-group">
-              <label for="nombre2">Nombre completo</label>
-              <input type="text" class="form-control" id="nombre2" placeholder="Nombre completo">
-            </div>
-            <div class="form-group">
-              <label for="email2">Dirección de email</label>
-              <input type="email" class="form-control" id="email2" placeholder="Introduzca su email">
-            </div>
-            <div class="radio">
-              <label>
-                <input type="radio" name="sexo2" id="hombre2" value="hombre" checked>
-                Hombre
-              </label>
-            </div>
-            <div class="radio">
-              <label>
-                <input type="radio" name="sexo2" id="mujer2" value="mujer">
-                Mujer
-              </label>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/lib/bootstrap.min.js"></script>
-    <script src="js/lib/handlebars.js"></script>
-    <script src="js/lib/underscore.js"></script>
-    <script src="js/lib/backbone.js"></script>
-    <script src="js/router.js"></script>
-  </body>
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <script src="js/lib/bootstrap.min.js"></script>
+        <script src="js/inscripcion.js"></script>
+    </body>
 </html>

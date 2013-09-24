@@ -44,8 +44,8 @@ var ParejaAPI = {
     },
     addPareja : function(req, res){//TODO validate
         var pareja = req.body;
-        primerJugadorJson = pareja[0];
-        segundoJugadorJson = pareja[1];
+        primerJugadorJson = pareja['jugador1'];
+        segundoJugadorJson = pareja['jugador2'];
         _createPareja(primerJugadorJson, segundoJugadorJson, res);
     },
     getParejasSinAsignar : function(req, res){
@@ -91,8 +91,10 @@ function _createJugador(data, callback){
 
 function _savePareja(primerJugador, segundoJugador, res){
     config.getFaseEnCurso(function(err, faseEnCurso){//TODO control de errores
-        var parejaData = {jugador1: primerJugador._id, jugador2: segundoJugador._id, fase: faseEnCurso._id};
+        var parejaData = {jugador1: {_id: primerJugador._id, name: primerJugador.name, sexo: primerJugador.sexo},
+         jugador2: {_id: segundoJugador._id, name: segundoJugador.name, sexo: segundoJugador.sexo}};
         models.Pareja.create(parejaData, function(err, pareja){
+
             _sendDocumentIfNotError(res, err, pareja);
         });
     });
